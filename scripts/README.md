@@ -5,6 +5,7 @@
 --distancia mínima para el recorte (metros)
 
 --distancia máxima para el recorte (metros)
+
 ---
 ## Uso rápido
 ### Nombre por defecto (cambia extension .bag a .mp4)
