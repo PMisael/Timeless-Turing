@@ -8,6 +8,6 @@ Este proyecto implementa un **pipeline** el cual parte desde la captura con **In
 1. **Captura** → Vídeos RGB‑D en formato `.bag`.
 2. **Pre‑procesamiento** → Eliminación de fondo y exportación a `.mp4`.
 3. **Landmark Detection** → **MediaPipe Pose** para identificar articulaciones y rastrear extremidades.
-4. **Clasificación** → Red neuronal densa para etiquetar cada postura (p. ej. "saludo", "brazos abiertos", "brazos cruzados", "posición fetal").
+4. **Clasificación** → Red neuronal densa para etiquetar cada postura (p. ej. "brazos cruzados", "posición fetal", "posición firmes", "otra").
 
 ---
