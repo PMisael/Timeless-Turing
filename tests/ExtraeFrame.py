@@ -3,7 +3,7 @@ import cv2
 import pandas as pd
 
 class MpPose:
-    def __init__(self,video=False):
+    def __init__(self,video=True):
         self.mp_drawing=mp.solutions.drawing_utils
         self.mp_pose=mp.solutions.pose
         self.video=video
