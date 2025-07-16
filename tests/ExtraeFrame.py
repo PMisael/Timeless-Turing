@@ -92,7 +92,7 @@ class Video:
 #
 class IMAGEN:
     def __init__(self, path):
-        self.pose  = MpPose()
+        self.pose  = MpPose(video=False)
         self.frame = None
         self.path  = path
     # 
