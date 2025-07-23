@@ -1,7 +1,3 @@
-"""
-bag2nobg.py  – Reproduce un .bag y guarda vídeo RGB con fondo eliminado
-               (usa profundidad en vivo, sin pasar por npy)
-"""
 import pyrealsense2 as rs, cv2, numpy as np, argparse, os
 from pathlib import Path
 
@@ -17,8 +13,7 @@ if args.out is None:
     bag_path = Path(args.bag)
     # Mismo nombre, extensión .mp4
     args.out = str(bag_path.with_suffix(".mp4"))
-
-# ---------- pipeline ----------
+#
 pipe = rs.pipeline()
 cfg  = rs.config()
 cfg.enable_device_from_file(args.bag, repeat_playback=False)
