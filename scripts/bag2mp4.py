@@ -67,7 +67,7 @@ try:
             writer = cv2.VideoWriter(args.out, fourcc, fps, (w, h))
         writer.write(nobg)
 except Exception as e:
-    print(f"Ha ocurrido un problema:\n\t{e}")      # se alcanza fin natural del .bag
+    pass      # se alcanza fin natural del .bag
 finally:
     pipe.stop()
 print("Vídeo generado →", os.path.abspath(args.out))

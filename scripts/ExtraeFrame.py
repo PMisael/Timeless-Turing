@@ -52,7 +52,7 @@ class Video:
         self.frame = None
         self.data  = []
     # 
-    def process(self,label,csv_path,step=10,reproduce=False):
+    def Extrae_coordenadas(self,label,csv_path,step=10,reproduce=False):
         cap=cv2.VideoCapture(self.path)
         contador=0
         #
