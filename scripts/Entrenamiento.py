@@ -31,8 +31,8 @@ class Modelo:
         self.poses_lb     = LabelBinarizer()
     #
     def cargar_datos(self):
-        self.df_train_val   =pd.read_csv("data/train_val_csv/dataset_completo.csv")
-        self.df_test  =pd.read_csv("data/test_csv/dataset_completo.csv")
+        self.df_train_val   =pd.read_csv("data/csv/train_val_csv/dataset_completo.csv")
+        self.df_test  =pd.read_csv("data/csv/test_csv/dataset_completo.csv")
     #
     def dividir_datos(self):
         # Entrenamiento 80% + Validacion 20%

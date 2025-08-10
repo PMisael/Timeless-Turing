@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from scripts.ExtraeFrame import Video
+from scripts.Analizador import Video
 #
 class Preparar_dataset:
     def __init__(self):
@@ -10,14 +10,14 @@ class Preparar_dataset:
     #
     def Crea_carpetas(self):
         # Datos para Entrenamiento y Validación
-        self.data_train_val = self.data/"train_val_csv"
+        self.data_train_val = self.data/"csv/train_val_csv"
         Path(self.data_train_val).mkdir(parents=True, exist_ok=True)
         # Datos para Test
-        self.data_test      = self.data/"test_csv"
+        self.data_test      = self.data/"csv/test_csv"
         Path(self.data_test).mkdir(parents=True, exist_ok=True)
     #
     def Extrae_frames(self):
-        videos = [p.resolve() for p in (self.data/"processed_videos").rglob("*.mp4") if p.stem!="Prueba"]
+        videos = [p.resolve() for p in (self.data/"processed_videos").rglob("*.mp4") if p.parent.stem!="PruebasReales"]
         for video in videos:
             print(video,video.stem)
         #
@@ -26,8 +26,8 @@ class Preparar_dataset:
             ruta_salida=str((self.data_train_val if path.parent.stem=='train_val' else self.data_test)/path.stem)+".csv"
             #
             print(f'\n\nProcesando video:  {str(path)} con etiqueta {label}, guardando en {ruta_salida}\n\n')
-            video=Video(path)
-            video.Extrae_coordenadas(label,ruta_salida,step=5,reproduce=False)
+            video=Video(path, True)
+            video.Extrae_frames(label,ruta_salida,step=5,reproduce=False)
     #
     def une_csvs(self):
         Salida    = Path("dataset_completo.csv")
