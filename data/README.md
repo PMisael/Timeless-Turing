@@ -15,6 +15,9 @@ data/
 ├── fotos/                # Imágenes utilizadas para pruebas rápidas de predicción
 │
 ├── processed_videos/     # Videos .mp4 listos para ser procesados por MediaPipe Pose
+│   ├── PruebasReales/         # Videos .mp4 para probar el modelo
+│   ├── test/         # Videos .mp4 para preparar el conjunto de prueba
+│   └── train_val/    # Videos .mp4 para preparar el conjunto de entrenamiento y validación
 │
 └── README.md             # Este archivo
 ```
@@ -24,3 +27,4 @@ data/
   - test_csv/ → CSVs para evaluar el rendimiento final del modelo.
   - fotos/ → Imágenes individuales empleadas para pruebas rápidas con imagenes usando [`Tester.py`](../scripts/Tester.py).
   - processed_videos/ → Videos en formato .mp4 que ya han pasado por el filtrado de fondo mediante el script [`bag2mp4.py`](../scripts/bag2mp4.py).
+    - Esta carpeta está disponible para descargar desde [Google Drive](https://drive.google.com/drive/folders/1kxPISQjgr6vX_-z4FhiXL4QVWJOGZun4?usp=sharing).
