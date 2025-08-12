@@ -11,8 +11,8 @@ Esta guía explica **qué hace cada script** y **cómo usarlo**.
 - [1) `bag2mp4.py` — Conversión y filtrado de .bag](#1-bag2mp4py--conversión-y-filtrado-de-bag)
 - [2) `MpPose.py` — Uso de Mediapipe Pose para extraer puntos del cuerpo](#2-mpposepy--uso-de-mediapipe-pose-para-extraer-puntos-del-cuerpo)
 - [3) `Analizador.py` — Manipulador de imagenes y videos](#3-analizadorpy--manipulador-de-imagenes-y-videos)
-- [4) `Preparar_dataset.py` — Construcción del dataset](#4-preparar_dataset.py--construcción-del-dataset)
-- [5) `Entrenamiento.py` — Modelo y entrenamiento](#5-entrenamiento.py--modelo-y-entrenamiento)
+- [4) `Preparar_dataset.py` — Construcción del dataset](#4-preparar_datasetpy--construcción-del-dataset)
+- [5) `Entrenamiento.py` — Modelo y entrenamiento](#5-entrenamientopy--modelo-y-entrenamiento)
 - [6) `Tester.py` — Predicción en video/imagen](#6-tester.py--predicción-en-videoimagen)
 - [Convenciones de nombres y rutas](#-convenciones-de-nombres-y-rutas)
 - [FAQ (errores comunes)](#-faq-errores-comunes)
@@ -40,7 +40,7 @@ Esta guía explica **qué hace cada script** y **cómo usarlo**.
 ```
 ---
 ## 1) bag2mp4.py — Conversión y filtrado de .bag
-Propósito: convertir grabaciones de Intel RealSense (.bag) a .mp4 aplicando filtro por rango de profundidad para eliminar fondo y dejar solo al sujeto.
+**Propósito:** convertir grabaciones de Intel RealSense (.bag) a .mp4 aplicando filtro por rango de profundidad para eliminar fondo y dejar solo al sujeto.
 ### 🧠 Qué hace
 - Lee frames RGB + Depth de .bag.
 - Enmascara pixeles fuera de [min, max].
@@ -100,3 +100,93 @@ Sus principales funciones son:
     - Solo guarda frames donde se detectan los 33 puntos.
     - Genera un CSV con 99 columnas de coordenadas + 1 columna label.
   - Guardar CSV (`guardaCSV()`) → exporta la lista de resultados (self.data) a un archivo CSV, asignando nombres de columnas dependiendo si es modo entrenamiento o predicción.
+- `Clase Imagen`:
+  - Inicializar (`__init__()`) → carga una imagen desde la ruta indicada y prepara MpPose en modo imagen estática.
+  - Predecir pose en imagen (`Predice()`) → procesa la imagen para:
+    - Detectar los 33 puntos clave del cuerpo.
+    - Predecir la pose con el modelo entrenado.
+    - Mostrar en pantalla la imagen con el nombre de la pose detectada, si se solicita (muestra=True).
+---
+## 4) [Preparar_dataset.py](./Preparar_dataset.py) — Construcción del dataset
+**Propósito:** Automatizar la generación de datasets a partir de videos .mp4 ya preprocesados (sin fondo): crea carpetas de salida, extrae coordenadas (x,y,z) de los 33 puntos (99 features) usando [Analizador.Video](#3-analizadorpy--manipulador-de-imagenes-y-videos), genera CSVs por video, y, al final, produce un CSV unificado por partición (train/val y test).
+### 🧠 Qué hace
+Recorre los videos procesados, extrae automáticamente las coordenadas de todos los puntos detectados por MediaPipe Pose, guarda un CSV para cada video y finalmente combina los resultados en un único archivo por partición (entrenamiento/validación y prueba). Está diseñado para estructurar los datos de forma uniforme y lista para ser utilizada en el entrenamiento del modelo.
+- `__init__()` → Inicializa rutas base (data/) y placeholders para data_test y data_train_val.
+- `Crea_carpetas()` → Crea (si no existen) las rutas:
+  - [data/csv/train_val_csv/](../data/csv/train_val_csv).
+  - [data/csv/test_csv/](../data/csv/test_csv).
+- `Extrae_frames()`:
+  - Busca todos los .mp4 dentro de data/processed_videos/, ignorando la subcarpeta llamada PruebasReales.
+  - La etiqueta se toma del nombre del archivo (path.stem.upper()).
+  - Decide la carpeta de salida en función de la ubicación del video:
+    - Si la subcarpeta en la que se encuentra se llama train_val → guarda en train_val_csv/
+    - En cualquier otro caso → guarda en test_csv/
+  - Para cada video:
+    - Instancia `Video(path, train=True)`.
+    - Llama a `Video.Extrae_frames(label, ruta_salida, step=5, reproduce=False)` para generar el CSV.
+    - Solo guarda frames con los 33 puntos detectados con un `paso` de 5 frames.
+- `Une_csvs()` → Para cada carpeta (train_val_csv/ y test_csv/):
+  - Concatena todos los CSVs (excepto dataset_completo.csv cuando ya hay uno generado).
+  - Elimina duplicados.
+  - Guarda un CSV unificado llamado dataset_completo.csv en esa carpeta.
+- `main()` → Ejecuta la secuencia completa:
+  - Crea_carpetas()
+  - Extrae_frames()
+  - Une_csvs().
+### ▶️ Uso (CLI)
+El script puede ejecutarse directamente desde la terminal como paquete:
+``` bash
+python -m scripts.Preparar_dataset.py
+```
+### 🔍 Notas y consideraciones
+- `step=5` en `Extrae_frames()` controla cada cuántos frames se extraen features (puedes ajustarlo dentro del script si necesitas más/menos densidad).
+- Solo se guardan registros cuando MediaPipe detecta los 33 puntos (calidad ajustable).
+- La etiqueta depende estrictamente del nombre de archivo; evita espacios raros y mantén una convención clara.
+- `Une_csvs()` elimina duplicados (útil si hay solapamientos).
+
+### ⚠️ Errores comunes
+- No genera CSVs → Revisa que processed_videos/ tenga .mp4 fuera de PruebasReales/ y que la detección de puntos funcione (iluminación/encuadre).
+- Todo cae en test_csv/ → Asegúrate de que los videos para entrenamiento estén bajo una carpeta padre llamada train_val.
+- Clases inesperadas → El nombre del video define la etiqueta. Renombra los archivos si es necesario.
+---
+## 5) [Entrenamiento.py](.Entrenamiento.py) — Modelo y entrenamiento
+**Propósito:** Entrenar y evaluar un clasificador multiclase a partir de las 99 características por frame, guardando el mejor modelo y registrando métricas y gráficas para análisis de desempeño.
+### 🧠 Qué hace
+Este módulo carga los CSV unificados (`dataset_completo.csv`) de train/val y test, convierte las etiquetas a one-hot, construye una red neuronal densa (MLP) con BatchNormalization y Dropout, entrena con early saving del mejor modelo (por val_loss), evalúa en el conjunto de prueba y grafica la historia de entrenamiento (accuracy y loss).
+- `__init__()` → Inicializa dataframes de entrada, matrices X/Y para train/val/test, el modelo Keras y un LabelBinarizer para codificar etiquetas.
+- `cargar_datos()` → Lee:
+  - data/csv/train_val_csv/dataset_completo.csv
+  - data/csv/test_csv/dataset_completo.csv
+- `dividir_datos()`:
+  - Separa features y labels en train/val; hace one-hot con LabelBinarizer.
+  - Realiza train_test_split estratificado (test_size=0.20, random_state=42).
+  - Prepara X_test/Y_test desde el CSV de test y codifica sus etiquetas.
+  - Guarda el mapeo índice → clase en [models/mapeo_etiquetas.json](../models/mapeo_etiquetas.json).
+- `construccion()`:
+Crea un *Red Neuronal Densa*:
+Input(n_features) → Dense(128, relu) → BatchNorm → Dropout(0.30) →
+Dense(64, relu) → BatchNorm → Dropout(0.30) → Dense(n_classes, softmax)
+Compila con Adam(lr=1e-3), categorical_crossentropy, accuracy.
+- `entrenamiento()`:
+  - Autonumera models/best_model_*.keras según los existentes.
+
+Usa ModelCheckpoint(..., save_best_only=True, monitor='val_loss').
+
+Entrena epochs=100, batch_size=256, validando con (X_val, Y_val).
+
+Devuelve history (historial de métricas).
+
+evaluacion()
+
+Imprime Accuracy en test.
+
+Calcula confusion_matrix y classification_report (usando poses_lb.classes_).
+
+graficar_entrenamiento(history)
+Muestra dos gráficas (accuracy y loss) con curvas de train y val.
+
+getX_test_Y_test_poses_lb()
+Devuelve (X_test, Y_test, poses_lb) para comparativas externas (útil en el notebook).
+
+main()
+Pipeline end-to-end: cargar_datos() → dividir_datos() → construccion() → entrenamiento() → evaluacion() → graficar_entrenamiento().
