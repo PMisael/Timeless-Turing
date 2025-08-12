@@ -38,7 +38,7 @@ Trabajar con adultos permite:
   - División en *training*, *validation* y *test set*.
 
 - **Entrenamiento**:
-  - Red neuronal densa (MLP) con:
+  - Red neuronal densa con:
     - Batch Normalization
     - Dropout
     - Optimizador Adam
