@@ -1,6 +1,6 @@
 # Clasificación Automática de Poses Corporales
 
-Prototipo funcional para la **detección y clasificación automática de poses humanas** utilizando [MediaPipe Pose](https://developers.google.com/mediapipe/solutions/vision/pose) y una red neuronal densa entrenada en TensorFlow.  
+Prototipo funcional para la **detección y clasificación automática de poses humanas** utilizando [MediaPipe Pose](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) y una red neuronal densa entrenada en TensorFlow.  
 
 Este trabajo forma parte de mi **Proyecto Terminal** de Ingeniería Biomédica y constituye la **fase inicial** de un sistema más amplio para el análisis automatizado de **Movimientos Generales (GMA)** en neonatos, orientado a la **detección temprana de alteraciones neuromotoras**.  
 En esta versión se utilizan videos de **adultos** como entorno de validación controlado para probar la viabilidad técnica del flujo completo.
@@ -20,11 +20,11 @@ Trabajar con adultos permite:
 
 ## 📚 ¿Qué hace?
 - **Captura de video**:
-  - Uso de una librería de **RealSense** en Ubuntu para grabar con la cámara **Intel RealSense D455** mediante una interfaz gráfica (GUI).
+  - Uso de una librería de **RealSense** en Ubuntu para grabar con la cámara **[Intel RealSense D435](https://www.intel.la/content/www/xl/es/products/sku/128255/intel-realsense-depth-camera-d435/specifications.html)** mediante una interfaz gráfica (GUI).
   - Los videos se guardan en formato `.bag` (archivo nativo de RealSense con información de color y profundidad).
 
 - **Preprocesamiento y eliminación de fondo**:
-  - Conversión de `.bag` a `.mp4` mediante el script `bag2mp4.py`.
+  - Conversión de `.bag` a `.mp4`.
   - Aplicación de filtrado por **rango de profundidad configurable**, eliminando el fondo y dejando únicamente al sujeto en primer plano.
   - Resultado: un video `.mp4` limpio, optimizado para análisis y entrenamiento.
 
