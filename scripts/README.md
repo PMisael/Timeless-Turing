@@ -14,8 +14,6 @@ Esta guía explica **qué hace cada script** y **cómo usarlo**.
 - [4) `Preparar_dataset.py` — Construcción del dataset](#4-preparar_datasetpy--construcción-del-dataset)
 - [5) `Entrenamiento.py` — Modelo y entrenamiento](#5-entrenamientopy--modelo-y-entrenamiento)
 - [6) `Tester.py` — Predicción en video/imagen](#6-testerpy--predicción-en-videoimagen)
-- [Convenciones de nombres y rutas](#-convenciones-de-nombres-y-rutas)
-- [FAQ (errores comunes)](#-faq-errores-comunes)
 
 ---
 
