@@ -13,7 +13,7 @@ Esta guía explica **qué hace cada script** y **cómo usarlo**.
 - [3) `Analizador.py` — Manipulador de imagenes y videos](#3-analizadorpy--manipulador-de-imagenes-y-videos)
 - [4) `Preparar_dataset.py` — Construcción del dataset](#4-preparar_datasetpy--construcción-del-dataset)
 - [5) `Entrenamiento.py` — Modelo y entrenamiento](#5-entrenamientopy--modelo-y-entrenamiento)
-- [6) `Tester.py` — Predicción en video/imagen](#6-tester.py--predicción-en-videoimagen)
+- [6) `Tester.py` — Predicción en video/imagen](#6-testerpy--predicción-en-videoimagen)
 - [Convenciones de nombres y rutas](#-convenciones-de-nombres-y-rutas)
 - [FAQ (errores comunes)](#-faq-errores-comunes)
 
@@ -169,24 +169,56 @@ Dense(64, relu) → BatchNorm → Dropout(0.30) → Dense(n_classes, softmax)
 Compila con Adam(lr=1e-3), categorical_crossentropy, accuracy.
 - `entrenamiento()`:
   - Autonumera models/best_model_*.keras según los existentes.
-
-Usa ModelCheckpoint(..., save_best_only=True, monitor='val_loss').
-
-Entrena epochs=100, batch_size=256, validando con (X_val, Y_val).
-
-Devuelve history (historial de métricas).
-
-evaluacion()
-
-Imprime Accuracy en test.
-
-Calcula confusion_matrix y classification_report (usando poses_lb.classes_).
-
-graficar_entrenamiento(history)
-Muestra dos gráficas (accuracy y loss) con curvas de train y val.
-
-getX_test_Y_test_poses_lb()
-Devuelve (X_test, Y_test, poses_lb) para comparativas externas (útil en el notebook).
-
-main()
-Pipeline end-to-end: cargar_datos() → dividir_datos() → construccion() → entrenamiento() → evaluacion() → graficar_entrenamiento().
+  - Usa ModelCheckpoint(..., save_best_only=True, monitor='val_loss') para guardar la mejor época del entrenamiento.
+  - Entrena epochs=100, batch_size=256, validando con (X_val, Y_val).
+  - Devuelve history (historial de métricas).
+- `graficar_entrenamiento(history)`
+  - Muestra dos gráficas (accuracy y loss) con curvas de train y val.
+- `evaluacion()`
+  - Imprime Accuracy en test.
+  - Calcula confusion_matrix y classification_report (usando poses_lb.classes_).
+- `getX_test_Y_test_poses_lb()`
+  - Devuelve (X_test, Y_test, poses_lb) para comparativas externas (útil en el notebook).
+- `main()`
+  - Pipeline end-to-end: cargar_datos() → dividir_datos() → construccion() → entrenamiento() → graficar_entrenamiento() → evaluacion().
+### ▶️ Uso (CLI)
+El script puede ejecutarse directamente desde la terminal como paquete:
+``` bash
+python -m scripts.Entrenamiento.py
+```
+### 🔍 Notas y consideraciones
+- `step=5` en `Extrae_frames()` controla cada cuántos frames se extraen features (puedes ajustarlo dentro del script si necesitas más/menos densidad).
+- Solo se guardan registros cuando MediaPipe detecta los 33 puntos (calidad ajustable).
+- La etiqueta depende estrictamente del nombre de archivo; evita espacios raros y mantén una convención clara.
+- `Une_csvs()` elimina duplicados (útil si hay solapamientos).
+### ⚠️ Errores comunes
+- FileNotFoundError de CSVs → verifica que los dataset_completo.csv existen y tienen columna label.
+- Desalineación de clases (ValueError en métricas) → asegura que el LabelBinarizer y mapeo_etiquetas.json correspondan al entrenamiento actual.
+---
+## 6) [Tester.py](./Tester.py) — Predicción en video/imagen
+**Propósito:** Ofrecer una interfaz sencilla para cargar un modelo entrenado y realizar predicciones sobre videos o imágenes nuevas, generando (en el caso de video) un CSV de resultados con la serie tiempo–pose.
+### 🧠 Qué hace
+Centraliza la carga del modelo y del mapeo de etiquetas, y expone métodos de alto nivel para predecir en video (Predice_video) o imagen (Predice_imagen). Internamente reutiliza las clases Video e Imagen de Analizador.py, por lo que hereda sus ventajas: filtrado por detección de 33 puntos, muestreo por step, y generación de CSV con el formato adecuado.
+- `__init__()`
+  - Inicializa manejadores internos para el modelo (self.model), el Video/Imagen (self.media) y el diccionario de etiquetas (self.etiquetas).
+- `Carga_modelo(model_path, etiquetas_json_path)`
+  - Carga el mapeo de etiquetas (índice → nombre de clase) desde etiquetas_json_path (JSON).
+  - Carga el modelo Keras desde model_path con load_model.
+  - Resultado: deja listo el par (modelo, etiquetas) para inferencia.
+- `Predice_video(video_path: str, reproducir: bool)`
+  - Instancia Video(path=video_path, train=False).
+  - Define automáticamente la ruta de salida CSV en resultados/<nombre_video>.csv.
+  - Llama a Video.Prediccion(...) con:
+    - model=self.model
+    - mapeo_etiquetas=self.etiquetas
+    - csv_path=salida_csv
+    - step=15 (muestreo de frames)
+    - reproduce=reproducir (mostrar u ocultar ventana de video)
+  - Resultado: crea un CSV con columnas Segundo, Pose para todo el video.
+- `Predice_imagen(image_path, muestra)`
+  - Instancia Imagen(image_path).
+  - Llama a Imagen.Predice(...) con el modelo y el mapeo de etiquetas.
+  - Si muestra=True, abre una ventana con la imagen.
+  - Resultado: imprime en consola la etiqueta estimada y (opcional) la muestra en pantalla.
+- `main()`
+  - Carga un modelo y el mapeo de etiquetas, y llama a Predice_imagen(...).
