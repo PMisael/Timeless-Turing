@@ -52,7 +52,7 @@ class Modelo:
         mapeo={}
         for i,clase in enumerate(self.poses_lb.classes_):
             mapeo[i]=clase
-        with open('data/mapeo_etiquetas.json', 'w') as f:
+        with open('models/mapeo_etiquetas.json', 'w') as f:
             json.dump(mapeo, f)
     #
     def construccion(self):
@@ -76,7 +76,7 @@ class Modelo:
     #
     def entrenamiento(self):
         model_path = Path ("models").resolve()
-        models = [p for p in model_path.rglob("best_model*.keras")]
+        models = [p for p in model_path.rglob("best_model_*.keras")]
         model_name = str(model_path / f'best_model_{len(models)}.keras')
 
 
@@ -116,7 +116,7 @@ class Modelo:
         axes[1].set_title('Funcion de perdida del modelo')
         axes[1].set_ylabel('Funcion de perdida')
         axes[1].set_xlabel('Epoch')
-        axes[1].legend(['Train', 'Test'], loc='upper left')
+        axes[1].legend(['Train', 'Val'], loc='upper left')
 
         plt.tight_layout()
         plt.show()
