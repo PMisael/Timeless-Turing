@@ -13,7 +13,7 @@ Cada imagen muestra:
 ## Ejemplos de Resultados
 
 ### 1. Pose: BRAZOS_CRUZADOS
-![BRAZOS_CRUZADOS](./ChatGPT_BrazosCruzados.png)
+<img src="./ChatGPT_BrazosCruzados.png" alt="BRAZOS_CRUZADOS" width="500">
 
 **Descripción:**  
 El sujeto se encuentra de pie, con los brazos cruzados sobre el pecho.  
@@ -22,6 +22,7 @@ El modelo identifica los puntos clave de la cabeza, torso, brazos y piernas, con
 ---
 
 ### 2. Pose: POSICION_FETAL
+<img src="./ChatGPT_PosicionFetal.png" alt="POSICION_FETAL" width="500">
 
 **Descripción:**  
 El sujeto se encuentra en posición fetal de pie (en cuclillas, con el torso inclinado hacia adelante y brazos recogidos).  
@@ -31,7 +32,7 @@ Los puntos clave muestran una postura compacta, con la cabeza inclinada hacia ab
 
 ## Uso de estos resultados
 
-Estos resultados se generan como parte del proceso de validación de la red neuronal, para:
+Estos resultados se generan con `Predice_imagen(image_path, muestra)` del script [`Tester.py`](../scripts/Tester.py) como parte del proceso de prueba de la red neuronal, para:
 
 1. **Verificar la precisión de la clasificación:**  
    Comparar la etiqueta asignada (`Pose:`) con la postura real del sujeto.
@@ -47,6 +48,6 @@ Estos resultados se generan como parte del proceso de validación de la red neur
 ## Notas
 
 - Las imágenes son ejemplos representativos y no forman parte del conjunto de entrenamiento.
-- El esqueleto está generado mediante un algoritmo de estimación de pose (por ejemplo, [MediaPipe Pose](https://developers.google.com/mediapipe/solutions/vision/pose)).
-- La clasificación de la pose está basada en un modelo entrenado con datos etiquetados previamente.
+- El esqueleto está generado mediante un algoritmo de estimación de pose con [MediaPipe Pose](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker).
+- La clasificación de la pose fue predecida con [`best_model_8.keras`](../models)).
 
