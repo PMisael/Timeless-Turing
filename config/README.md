@@ -14,6 +14,8 @@ A continuación, se listan las más relevantes para el desarrollo:
 ## 🚀 Uso rápido de requirements.txt
 
 ``` bash
-conda create --name poses --file requirements.txt
-conda activate poses
+conda create --name nombre_entorno --file spec-file.txt
+conda activate nombre_entorno
+conda install pip
+python -m pip install -r requirements.txt 
 ```
