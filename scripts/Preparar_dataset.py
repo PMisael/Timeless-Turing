@@ -17,7 +17,7 @@ class Preparar_dataset:
         Path(self.data_test).mkdir(parents=True, exist_ok=True)
     #
     def Extrae_frames(self):
-        videos = [p.resolve() for p in (self.data/"processed_videos").rglob("*.mp4") if p.parent.stem!="PruebasReales"]
+        videos = [p.resolve() for p in (self.data/"processed_videos").rglob("*.mp4") if p.parent.stem!="PruebasConSujetos"]
         for video in videos:
             print(video,video.stem)
         #

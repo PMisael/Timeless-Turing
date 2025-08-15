@@ -21,7 +21,7 @@ class Tester:
         self.media.Prediccion(model            = self.model, 
                               mapeo_etiquetas  = self.etiquetas,
                               csv_path         = salida_csv,
-                              step             = 15,
+                              step             = 3,
                               reproduce        = reproducir)
     #
     def Predice_imagen(self, image_path: str, muestra: bool):
@@ -32,13 +32,15 @@ class Tester:
 
 
 def main():
-    MEDIA_PATH          = "data/fotos/foto1.png"
-    MODEL_PATH          = "models/best_model_25.keras"
+    VIDEO_PATH          = "data/processed_videos/PruebasConSujetos/Sujeto3_2.mp4"
+    PHOTO_PATH          = "data/fotos/ChatGPT_BrazosCruzados.png"
+    MODEL_PATH          = "models/best_model_8.keras"
     ETIQUETAS_JSON_PATH = "models/mapeo_etiquetas.json"
     #
     tester=Tester()
     tester.Carga_modelo(MODEL_PATH, ETIQUETAS_JSON_PATH)
-    tester.Predice_imagen(MEDIA_PATH)
+    tester.Predice_video(VIDEO_PATH, reproducir=True)
+    #tester.Predice_imagen(PHOTO_PATH, muestra=True)
 #
 #
 if __name__=='__main__':
