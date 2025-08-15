@@ -1,6 +1,6 @@
 ## 📦 Librerías principales
 
-El proyecto fue desarrollado en un entorno **conda** con las especificaciones de [spec-file.txt](./spec-file.txt) y las dependencias exactas están listadas en [`requirements.txt`](./requirements.txt).  
+El proyecto fue desarrollado en un entorno **conda** con las especificaciones de [`spec-file.txt`](./spec-file.txt) y las dependencias exactas están listadas en [`requirements.txt`](./requirements.txt).  
 A continuación, se listan las más relevantes para el desarrollo:
 
 - **TensorFlow** (`tensorflow`, `tensorboard`, `tensorflow-io-gcs-filesystem`) – Entrenamiento y despliegue de redes neuronales.
